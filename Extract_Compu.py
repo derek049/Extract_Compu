@@ -16,31 +16,18 @@ while True:
 	line = compu_data_list[line_no]
 	if line[0:25] == '<H4 ALIGN="center">Title:':
 		#this is the line with the title etc
-		len_line = len(line)
-		#look for the title first
-		#look for the first <BR>
-		char = 24 #start towards the end of the part we know
-		while True:
-			test_char = line[char:char + 4]
-			if test_char == "<BR>":
-				#we know where <BR> is
-				char_title = char
-				event_title = line[25:char_title]
-				print (event_title)
-				break
-			char = char + 1
-		while True:
-			#now look for the second <BR>
-			char = char + 1
-			test_char = line[char:char + 4]
-			if test_char == "<BR>":
-				#we know where 2nd <BR> is
-				char_venue = char
-				event_venue = line[char_title + 10:char_venue]
-				print (event_venue)
-				event_date_time = line[char_venue + 16:len_line - 6]
-				print (event_date_time)
-				break
+		#split on <BR> gives the title, then venue, then date time with extra characters
+		title_row = line
+		title_parts = title_row.split("<BR>")
+		event_title = title_parts[0]
+		event_title = event_title[25:]
+		print(event_title)
+		event_venue = title_parts[1]
+		event_venue = event_venue[6:]
+		print(event_venue)
+		event_date_time = title_parts[2]
+		event_date_time = event_date_time[12:28]
+		print(event_date_time)
 		break
 	line_no = line_no + 1
 #find customer details
