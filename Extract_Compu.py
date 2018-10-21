@@ -29,51 +29,44 @@ while True:
 		event_date_time = event_date_time[12:28]
 		print(event_date_time)
 		break
-	line_no = line_no + 1
+	line_no = line_no + 1 #it wasn't this line so move to then next one
 #find customer details
-#open the cls file and add myself in the first line as a test
+#open the cls file and start capturing valid customers
 csv_file = open(path_csv_file,"a")
-
 for line_number in range(line_no,list_len): #this starts where we found the title info and goes to the end of the file
 	line = compu_data_list[line_number]
 	#check if this has customer info
 	if line[16:32] == "Customer Details":
 		#extract the name and phone number and write into a cls file
-		#look for the first comma
-		char = 31 #this is the colon after details
-		while True:
-			if line[char]  == ",":
-				customer_name = line[34:char]
-				split_name = customer_name.split() #divide into separate words by white spaces
-				if len(split_name) == 0:
-						break
-				salutation = split_name[0]
-				if salutation == ".":
-					salutation = " "
-				first_name = split_name[1]
-				surname = split_name[-1]
-				if len(first_name) > 2: #if a first name has 2 or 1 character it is probably initials
-					first_name = first_name.lower()
-					first_name = first_name[0].upper() + first_name[1:]
-				customer_name = salutation + " " + first_name + " " + surname
-				char_number = char + 2
-				customer_number = line[char_number:char_number + 10]
-				if int(customer_number) < 1000: 
-					break
-				number_27_format = "27" + customer_number[1:]
+		#split on commas to get te name and phone number
+		split_cust = line.split(",") 
+		customer_name = split_cust[0]
+		customer_name = customer_name[34:]
+		split_name = customer_name.split() #divide full names into separate words by white spaces
+		if len(split_name) != 0:
+			#only carry on if there's a name
+			salutation = split_name[0]
+			if salutation == ".":
+				salutation = " "
+			first_name = split_name[1]
+			surname = split_name[-1] #the last name is the surname
+			if len(first_name) > 2: #if a first name has 2 or 1 character it is probably initials
+				#change to capital letter then smalls
+				first_name = first_name.lower()
+				first_name = first_name[0].upper() + first_name[1:]
+			customer_name = salutation + " " + first_name + " " + surname
+			#now get the number, second in the split
+			customer_number = split_cust[1]
+			customer_number = customer_number[1:]
+			if int(customer_number) > 1000: #if it's smaller than 1000 it isn't a number
+				number_27_format = "27" + customer_number[1:] #drops the 0 and adds 27
 				#check for landlines
-				if number_27_format[2:4]== "11":
-					break
-				if number_27_format[2:4]== "12":
-					break
-				if number_27_format[2:4]== "13":
-					break
-				if number_27_format[2:4]== "21":
-					break
-				#write a line to the file
-				data_string = number_27_format + "," + message.format(customer_name) + "\n"
-				csv_file.write(data_string)
-				break
-			char = char + 1
+				if number_27_format[2:4] != "11":
+					if number_27_format[2:4] != "12":
+						if number_27_format[2:4] != "13":
+							if number_27_format[2:4] != "21":
+								#write a line to the file
+								data_string = number_27_format + "," + message.format(customer_name) + "\n"
+								csv_file.write(data_string)
 csv_file.close()
 print("Finished!")
